@@ -1,33 +1,31 @@
-﻿namespace DIProj;
+﻿using System;
+using System.Threading.Tasks;
+using DIProj.Code_24_08.Entities.Contracts;
+using DIProj.Code_24_08.Entities.Implementations;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace DIProj;
 
 public class Program
 {
     /**
-     * Lập trình bất đồng bộ trong c# là đa luồng hoặc đơn luồng (tùy compiler)
      *
-     * không thể biết trước thread nào thực hiện
-     *
-     * void => Task
-     * int, long, short => Task<datatype>
-     * 
-     * async => generate bunch of machine code
+     * scope : dùng xong là xóa đi
+     * transient: tạo mới liên tục, không biết khi nào là xóa
      */
 
     public static async Task Main(string[] args)
     {
-        var task = HelloAsync();
+        ServiceCollection collection = new();
 
-        Console.WriteLine("Do something else");
+        collection.AddScoped<IHorn, HeavyHorn>();
+        collection.AddSingleton<Car>();
 
-        var res = await task;
+        await using (var provider = collection.BuildServiceProvider())
+        {
+            var car = provider.GetRequiredService<Car>();   
 
-        Console.WriteLine($"Result: {res}");
-    }
-
-    public static async Task<string> HelloAsync()
-    {
-        await Task.Delay(1000);
-
-        return "Hello";
+            car.Beep();
+        }
     }
 }
