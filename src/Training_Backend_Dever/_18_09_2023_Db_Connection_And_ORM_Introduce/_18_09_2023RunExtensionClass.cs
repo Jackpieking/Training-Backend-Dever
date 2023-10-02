@@ -1,4 +1,8 @@
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Training_Backend_Dever._18_09_2023_Db_Connection_And_ORM_Introduce.Data;
+using Training_Backend_Dever._18_09_2023_Db_Connection_And_ORM_Introduce.Data.Entities;
 
 namespace Training_Backend_Dever._18_09_2023_Db_Connection_And_ORM_Introduce;
 
@@ -39,7 +43,7 @@ namespace Training_Backend_Dever._18_09_2023_Db_Connection_And_ORM_Introduce;
         - OnConfiguring -> Config ket noi den database va nhung thu khac lien quang ve database
         - DbSet<T>: Đại diện cho nguồn dữ liệu cua table T
         - EX: DbSet<Student> => Data của table student
-        entity === Table 
+        entity === Table
 
         Base ORM: dùng để phát triển các provider
         Provider: Các loại database
@@ -81,6 +85,32 @@ public static class _18_09_2023_Db_Connection_And_ORM_IntroduceRunExtensionMetho
 {
     public static async Task ExecuteAsync()
     {
+        await using TestContext context = new();
 
+        ClassRoomEntity classRoomEntity = new()
+        {
+            ClassroomNumber = "SA111",
+        };
+
+        // await context.ClassRoomEntities.AddAsync(classRoomEntity);
+
+        // await context.StudentEntities.AddAsync(entity: new()
+        // {
+        //     StudentName = "My name",
+        //     ClassRoomEntity = classRoomEntity
+        // });
+
+        // await context.SaveChangesAsync();
+
+        var foundStudent = await context.StudentEntities
+            .AsNoTracking()
+            .Where(predicate: student => student.StudentName.Equals("My name"))
+            .Select(selector: student => new StudentEntity
+            {
+                StudentName = student.StudentName
+            })
+            .FirstOrDefaultAsync();
+
+        System.Console.WriteLine(foundStudent.StudentName);
     }
 }
